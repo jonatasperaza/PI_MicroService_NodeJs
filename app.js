@@ -1,13 +1,19 @@
 const express = require('express');
+const { logger } = require('./src/middleware');
+const pinoHttp = require("pino-http")({ logger });
+const cors = require('cors');
+require('dotenv').config();
+
+const mainRouter =  require('./src/main');
 
 const app = express();
 
-const port = 3000;
+const port = process.env.PORT;
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-});
+app.use(cors());
+app.use(pinoHttp);
+app.use('', mainRouter);
 
 app.listen(port, () => {
-  console.log(`localhost:${port}`)
+  logger.info(`Server Iniciado: http://localhost:${port}`);
 });
