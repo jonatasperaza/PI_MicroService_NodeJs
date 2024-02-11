@@ -19,6 +19,8 @@ async function loginSigaa(user, pass) {
   await page.type('input[type="password"]', pass, {delay: 100});
   await page.click('button');
   await page.click('input[type="submit"]');
+  await page.waitForNavigation({waitUntil: 'networkidle0'});
+  await page.waitForSelector('.ui-link-inherit');
 
   return page;
 };
