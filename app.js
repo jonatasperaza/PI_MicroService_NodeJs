@@ -1,10 +1,10 @@
 const express = require('express');
-const { logger } = require('./src/middleware');
-const pinoHttp = require("pino-http")({ logger });
+const logger = require('./src/middleware');
+const pinoHttp = require('pino-http')({logger});
 const cors = require('cors');
 require('dotenv').config();
 
-const mainRouter =  require('./src/main');
+const mainRouter = require('./src/main');
 
 const app = express();
 

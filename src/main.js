@@ -1,9 +1,9 @@
 const express = require('express');
 
-const router = express.Router();
+const router = new express.Router();
 
 router.get('/', (req, res) => {
-    res.status(200).json({ msg: 'Hello Word' });
-  });
-  
+  res.status(200).json({msg: 'Hello Word'});
+});
+
 module.exports = router;
