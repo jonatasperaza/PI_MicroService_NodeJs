@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
  * @return {Object} Um objeto com: O navegador, a página atual e as páginas.
  */
 async function initBrowser() {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
   const pages = await browser.pages();
 
