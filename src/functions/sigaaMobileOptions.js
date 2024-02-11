@@ -1,7 +1,7 @@
 const loginSigaa = require('./loginSigaa');
 
 /**
- * Inicializa um navegador Puppeteer.
+ * Inicializa a pagina inicial do SIGAA Mobile.
  * @param {Object} data - Obejto contendo informacao do usuario
  * e o estado do navegador.
  * @return {Object} Um objeto com: O navegador
