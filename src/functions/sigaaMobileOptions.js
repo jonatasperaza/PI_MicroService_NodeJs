@@ -9,7 +9,7 @@ const loginSigaa = require('./loginSigaa');
  */
 async function sigaaMobileOptions(data) {
   const {user, pass} = data;
-  const {page, pages} = await loginSigaa(user, pass);
+  const {page, pages, browser} = await loginSigaa(user, pass);
 
   const sigaaOptions = await page.$$('.ui-link-inherit');
   const classOption = sigaaOptions[0];
@@ -22,6 +22,7 @@ async function sigaaMobileOptions(data) {
   return {
     page,
     pages,
+    browser,
     classOption,
     gradeOption,
     exitSIGAA,
