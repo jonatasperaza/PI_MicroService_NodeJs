@@ -10,7 +10,7 @@ const URL_LOGIN = process.env.URL_LOGIN;
  * @return {Promise<Object>} Objeto com o browser e a página logada no SIGAA.
  */
 async function loginSigaa(user, pass) {
-  const {page, pages} = await initBrowser();
+  const {page, pages, browser} = await initBrowser();
   await page.goto(URL_LOGIN, {
     waitUntil: 'load',
     timeout: 0,
@@ -25,6 +25,7 @@ async function loginSigaa(user, pass) {
   return {
     page,
     pages,
+    browser,
   };
 };
 
