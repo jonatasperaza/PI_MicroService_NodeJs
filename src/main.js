@@ -1,9 +1,12 @@
 const express = require('express');
+const {SigaaRouter} = require('./App');
 
-const router = new express.Router();
+const app = express();
 
-router.get('/', (req, res) => {
+app.use('/sigaa', SigaaRouter);
+
+app.get('/', (req, res) => {
   res.status(200).json({msg: 'Hello Word'});
 });
 
-module.exports = router;
+module.exports = app;
