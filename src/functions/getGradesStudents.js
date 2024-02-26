@@ -44,7 +44,7 @@ async function getGradesStudents(index, data) {
     grades.push(materia);
   }
 
-  return {...studentInfo, grades};
+  return {studentInfo, grades};
 }
 
 module.exports = getGradesStudents;
