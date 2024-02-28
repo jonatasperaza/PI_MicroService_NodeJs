@@ -105,10 +105,10 @@ const extractDataFromMessage = (webMessage) => {
       '',
   );
 
-  const [command, ...args] = fullMessage.split(" ");
+  const [command, ...args] = fullMessage.split(' ');
   const prefix = command.charAt(0);
 
-  const commandWithoutPrefix = command.replace(new RegExp(`^[${PREFIX}]+`), "");
+  const commandWithoutPrefix = command.replace(new RegExp(`^[${PREFIX}]+`), '');
 
   return {
     remoteJid: webMessage?.key?.remoteJid,

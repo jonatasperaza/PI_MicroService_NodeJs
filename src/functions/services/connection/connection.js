@@ -11,7 +11,7 @@ const {logger} = require('../../../middleware');
 
 exports.connect = async () => {
   const {state, saveCreds} = await useMultiFileAuthState(
-      path.resolve(__dirname, '..', 'assets', 'auth', 'baileys')
+      path.resolve(__dirname, '..', 'assets', 'auth', 'baileys'),
   );
 
   const {version} = await fetchLatestBaileysVersion();
