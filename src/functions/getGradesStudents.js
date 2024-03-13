@@ -25,7 +25,6 @@ async function getGradesStudents(index, data) {
 
   const grades = [];
 
-
   for (let i = 0; i < tdDisciplinas.length; i++) {
     const disciplinaFullName = await currentPage.evaluate((element) =>
       element.textContent.trim(), tdDisciplinas[i]);

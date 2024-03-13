@@ -1,11 +1,10 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+
 const {logger} = require('./src/middleware');
 const pinoHttp = require('pino-http')({logger});
 const {PORT} = require('./src/config');
-
-const {connect, load} = require('./src/functions/services');
 
 const mainRouter = require('./src/main');
 
@@ -40,6 +39,4 @@ app.use('', mainRouter);
 
 app.listen(PORT, async () => {
   logger.info(`Server Iniciado: http://localhost:${PORT}`);
-  const socket = await connect();
-  load(socket);
 });
