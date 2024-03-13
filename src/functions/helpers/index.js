@@ -1,13 +1,11 @@
 const uploadTelegra = require('./uploladTelegra');
 const getGradesType = require('./getGradesType');
-const dynamicCommand = require('./dynamicCommand');
-
-const {onlyNumbers, question} = require('./utilsFromConnection');
+const getAttOfStudent = require('./getAttOfString');
+const messageUser = require('./getSliceMessage');
 
 module.exports = {
   uploadTelegra,
   getGradesType,
-  onlyNumbers,
-  question,
-  dynamicCommand,
+  getAttOfStudent,
+  messageUser,
 };
