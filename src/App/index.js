@@ -1,5 +1,7 @@
-const SigaaRouter = require('./Sigaa/Sigaa');
+const Sigaa = require('./Sigaa/Sigaa');
+const WhatsApp = require('./WhatsApp/WhatsApp');
 
 module.exports = {
-  SigaaRouter,
+  Sigaa,
+  WhatsApp,
 };

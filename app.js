@@ -1,7 +1,8 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const logger = require('./src/middleware');
+
+const {logger} = require('./src/middleware');
 const pinoHttp = require('pino-http')({logger});
 const {PORT} = require('./src/config');
 
@@ -32,11 +33,10 @@ app.use(
     }),
 );
 
-
 app.use(cors());
 app.use(pinoHttp);
 app.use('', mainRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`Server Iniciado: http://localhost:${PORT}`);
 });

@@ -18,14 +18,20 @@
     "pino-pretty": "^10.3.1"
   },
   "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^6.6.0",
     "axios": "^1.6.7",
     "cors": "^2.8.5",
+    "evobotbaileys": "^0.0.2",
     "express": "^4.18.2",
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
     "helmet": "^7.1.0",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
     "pino": "^8.18.0",
     "pino-http": "^9.0.0",
-    "puppeteer": "^22.0.0"
+    "puppeteer": "^22.0.0",
+    "qrcode-terminal": "^0.12.0"
   }
 }
