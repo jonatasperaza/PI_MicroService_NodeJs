@@ -1,71 +1,40 @@
-const {extractDataFromMessage} = require('../../helpers');
 const fs = require('fs');
 
-exports.loadCommomFunctions = ({socket, webMessage}) => {
-  const {remoteJid, prefix, commandName, args, userJid, isReply, replyJid} =
-    extractDataFromMessage(webMessage);
+const {BOT_EMOJI} = require('../../../config');
 
-  if (!remoteJid) {
-    return;
-  }
-
+/**
+ * @param {Object} socket - Socket instanciado
+ * @param {String} remoteJid - Numero que sera enviado
+ * @return {Object} Obejto com as funcoes de envio.
+ */
+function loadCommomFunctions(socket, remoteJid) {
   const sendText = async (text) => {
     return await socket.sendMessage(remoteJid, {
       text: `${BOT_EMOJI} ${text}`,
     });
   };
 
-  const sendReply = async (text) => {
-    return await socket.sendMessage(
+  const sendImage = async (file, text) => {
+    await socket.sendMessage(
         remoteJid,
-        {text: `${BOT_EMOJI} ${text}`},
-        {quoted: webMessage},
+        {image: {url: file}, caption: text, mimetype: 'image/png'},
     );
   };
 
-  const sendReact = async (emoji) => {
-    return await socket.sendMessage(remoteJid, {
-      react: {
-        text: emoji,
-        key: webMessage.key,
-      },
-    });
-  };
-
-  const sendSuccessReact = async () => {
-    return await sendReact('✅');
-  };
-
-  const sendWaitReact = async () => {
-    return await sendReact('⏳');
-  };
-
-  const sendWarningReact = async () => {
-    return await sendReact('⚠️');
-  };
-
-  const sendErrorReact = async () => {
-    return await sendReact('❌');
-  };
-
   const sendSuccessReply = async (text) => {
-    await sendSuccessReact();
-    return await sendReply(`✅ ${text}`);
+    return await sendText(`✅ ${text}`);
   };
 
   const sendWaitReply = async (text) => {
-    await sendWaitReact();
-    return await sendReply(`⏳ Aguarde! ${text}`);
+    return await sendText(`⏳ Aguarde! ${text}`);
   };
 
   const sendWarningReply = async (text) => {
-    await sendWarningReact();
-    return await sendReply(`⚠️ Atenção! ${text}`);
+    return await sendText(`⚠️ Atenção! ${text}`);
   };
 
   const sendErrorReply = async (text) => {
-    await sendErrorReact();
-    return await sendReply(`❌ Erro! ${text}`);
+    return await sendText(`❌ Erro! ${text}`);
   };
 
   const sendStickerFromFile = async (file) => {
@@ -83,25 +52,15 @@ exports.loadCommomFunctions = ({socket, webMessage}) => {
   return {
     socket,
     remoteJid,
-    userJid,
-    prefix,
-    commandName,
-    args,
-    isReply,
-    replyJid,
-    webMessage,
     sendText,
-    sendReply,
+    sendImage,
     sendStickerFromFile,
     sendImageFromFile,
-    sendReact,
-    sendSuccessReact,
-    sendWaitReact,
-    sendWarningReact,
     sendErrorReply,
     sendSuccessReply,
     sendWaitReply,
     sendWarningReply,
-    sendErrorReact,
   };
 };
+
+module.exports = loadCommomFunctions;

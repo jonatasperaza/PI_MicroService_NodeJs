@@ -1,64 +1,87 @@
-const path = require('path');
-const {question, onlyNumbers} = require('../../helpers');
 const {
-  default: makeWASocket,
-  DisconnectReason,
+  default: botConnect,
   useMultiFileAuthState,
-  fetchLatestBaileysVersion,
-} = require('@whiskeysockets/baileys');
+  DisconnectReason,
+  makeInMemoryStore,
+} = require('evobotbaileys');
+const {Boom} = require('@hapi/boom');
 
-const {logger} = require('../../../middleware');
+const logger = require('../../../middleware/logger');
 
-exports.connect = async () => {
-  const {state, saveCreds} = await useMultiFileAuthState(
-      path.resolve(__dirname, '..', 'assets', 'auth', 'baileys'),
-  );
+const store = makeInMemoryStore({logger});
 
-  const {version} = await fetchLatestBaileysVersion();
-
-  const socket = makeWASocket({
-    printQRInTerminal: false,
-    version,
+/**
+ * Conecta ao serviço do WhatsApp com credenciais fornecidas e inicializa o bot.
+ * @return {Promise<Object>} Uma promise com informacoes do bot.
+ */
+async function connect() {
+  const {state, saveCreds} = await useMultiFileAuthState(`./auth/baileys`);
+  const bot = botConnect({
     logger,
+    printQRInTerminal: true,
+    browser: [`ZYRA`, 'Safari', '1.0.0'],
     auth: state,
-    browser: ['Ubuntu', 'Chrome', '20.0.04'],
-    markOnlineOnConnect: true,
+    defaultQueryTimeoutMs: undefined,
+    getMessage: async (key) => {
+      if (store) {
+        const msg = await store.loadMessage(key.remoteJid, key.id);
+        return msg.message || undefined;
+      }
+      return {
+        conversation: `BOT On!`,
+      };
+    },
   });
+  store.bind(bot.ev);
+  bot.serializeM = (msg) => smsg(bot, msg, store);
 
-  if (!socket.authState.creds.registered) {
-    const phoneNumber = await question('Informe o seu número de telefone: ');
-
-    if (!phoneNumber) {
-      throw new Error('Número de telefone inválido!');
-    }
-
-    const code = await socket.requestPairingCode(onlyNumbers(phoneNumber));
-
-    console.log(`Código de pareamento: ${code}`);
-  }
-
-  socket.ev.on('connection.update', (update) => {
+  bot.ev.on('connection.update', async (update) => {
     const {connection, lastDisconnect} = update;
-
     if (connection === 'close') {
-      const shouldReconnect =
-        lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
-
-      if (shouldReconnect) {
-        this.connect();
+      const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+      switch (reason) {
+        case DisconnectReason?.badSession:
+          bot.logout();
+          break;
+        case DisconnectReason?.connectionClosed:
+        case DisconnectReason?.connectionLost:
+        case DisconnectReason?.restartRequired:
+        case DisconnectReason?.timedOut:
+          await reconnect();
+          break;
+        case DisconnectReason?.connectionReplaced:
+          bot.logout();
+          break;
+        case DisconnectReason?.loggedOut:
+          bot.logout();
+          break;
+        case DisconnectReason?.Multidevicemismatch:
+          bot.logout();
+          break;
+        default:
+          bot.end(`Razão Desconhecida de Desconexão: ${reason}|${connection}`);
       }
     }
-
-    if (update.connection === 'open' ||
-        update.receivedPendingNotifications === 'true') {
-      logger.info(`BOT conectado!\n
-          -> Nome: ${socket.user.name}\n
-          -> Numero: ${socket.user.id}`,
-      );
+    if (
+      update.connection === 'open' ||
+      update.receivedPendingNotifications === 'true'
+    ) {
+      logger.info('BOT instanciado!');
     }
   });
+  bot.ev.on('creds.update', saveCreds);
+  return bot;
+}
 
-  socket.ev.on('creds.update', saveCreds);
+/**
+ * Reconecta o bot após uma desconexão.
+ * @return {Promise<void>} Uma promise que resolve quando o bot se reconectar.
+ */
+async function reconnect() {
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+  await connect();
+}
 
-  return socket;
+module.exports = {
+  connect,
 };
