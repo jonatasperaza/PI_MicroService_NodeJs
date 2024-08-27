@@ -6,7 +6,10 @@ const sigaaMobileOptions = require('./sigaaMobileOptions');
  * @return {Promise<Object>} Objeto informacoes do aluno e anchors.
  */
 async function studentGradesOptions(data) {
-  const {gradeOption, browser} = await sigaaMobileOptions(data);
+  const {gradeOption,
+    browser,
+    previewStudentImage} = await sigaaMobileOptions(data);
+
   let anchorIndex = 11;
   let currentPage = null;
   const gradeOptions = [];
@@ -24,6 +27,7 @@ async function studentGradesOptions(data) {
   async function handlePageElements(page) {
     const trElements = await page.$$('tr');
     const anchorElements = await page.$$('a');
+
     const studentName = await page.evaluate((element) => element
         .textContent, trElements[0]);
     const studentStatus = await page.evaluate((element) => element
@@ -37,6 +41,8 @@ async function studentGradesOptions(data) {
         .replace(/[\n\t]/g, '').trim();
     studentInfo.course = studentCourse.replace('Turma de entrada:', '')
         .replace(/[\n\t]/g, '').trim();
+
+    studentInfo.photo = previewStudentImage;
 
     const newTrs = trElements.slice(5);
 

@@ -12,7 +12,7 @@ router.get('/send-grades', async (req, res) => {
   const number = req.query.number;
 
   if (!index || !user || !pass) {
-    return router.status(400).json({error: 'Missing parameters'});
+    return res.status(400).json({error: 'Missing parameters'});
   }
 
   const bot = await connect();
