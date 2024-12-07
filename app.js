@@ -35,7 +35,7 @@ app.use(
 
 app.use(cors());
 app.use(pinoHttp);
-app.use('', mainRouter);
+app.use('/api', mainRouter);
 
 app.listen(PORT, async () => {
   logger.info(`Server Iniciado: http://localhost:${PORT}`);

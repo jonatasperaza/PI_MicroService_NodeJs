@@ -1,5 +1,21 @@
+const fs = require('fs');
+const {getGradesType} = require('./helpers');
 const studentGradesOptions = require('./studentGradesOptions');
-const {uploadTelegra, getGradesType} = require('./helpers');
+
+/**
+ * Converte uma imagem em Base64.
+ * @param {string} imagePath - Caminho para a imagem.
+ * @return {Promise<string>} - String Base64 da imagem.
+ */
+async function convertImageToBase64(imagePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(imagePath, (err, data) => {
+      if (err) return reject(err);
+      const base64Image = data.toString('base64');
+      resolve(`data:image/png;base64,${base64Image}`);
+    });
+  });
+}
 
 /**
  * @param {number} index - Index para clicar no boletim correto.
@@ -7,9 +23,7 @@ const {uploadTelegra, getGradesType} = require('./helpers');
  * @return {Promise<Object>} Objeto informacoes do aluno e anchors.
  */
 async function getGradesStudents(index, data) {
-  const {gradeOptions,
-    studentInfo,
-    currentPage} = await studentGradesOptions(data);
+  const {gradeOptions, studentInfo, currentPage} = await studentGradesOptions(data);
 
   await new Promise((resolve) => setTimeout(resolve, 4000));
   await gradeOptions[index].clickElement.click();
@@ -17,31 +31,43 @@ async function getGradesStudents(index, data) {
   await currentPage.setViewport({width: 1200, height: 800});
   await currentPage.screenshot({path: './src/assets/screenshot.png'});
 
-  const gradesImageLink = await uploadTelegra('./src/assets/screenshot.png');
-  studentInfo.gradesImage = gradesImageLink;
+  const gradesImageBase64 = await convertImageToBase64('./src/assets/screenshot.png');
+  studentInfo.gradesImage = gradesImageBase64;
 
   const tdDisciplinas = await currentPage.$$('td.disciplina');
-  const tdNotas = await currentPage.$$('td.nota');
+const tdNotas = await currentPage.$$('td.nota');
 
-  const grades = [];
+if (!tdDisciplinas || !tdNotas || tdDisciplinas.length === 0 || tdNotas.length === 0) {
+  throw new Error('Disciplinas ou notas não foram encontradas na página.');
+}
 
-  for (let i = 0; i < tdDisciplinas.length; i++) {
-    const disciplinaFullName = await currentPage.evaluate((element) =>
-      element.textContent.trim(), tdDisciplinas[i]);
+const grades = [];
 
-    const disciplina = disciplinaFullName.split(' - ')[1].trim();
-    const materia = {fullName: disciplinaFullName, name: disciplina, notas: {}};
+for (let i = 0; i < tdDisciplinas.length; i++) {
+  const disciplinaElement = tdDisciplinas[i];
+  if (!disciplinaElement) continue;
 
-    for (let j = 0; j < 12; j++) {
-      const tipoNota = getGradesType(j);
-      let nota = await currentPage.evaluate((element) =>
-        element.textContent.trim(), tdNotas[i * 12 + j]);
-      nota = nota.replace(/\n\t+/g, '');
-      materia.notas[tipoNota] = nota;
-    }
+  const disciplinaFullName = await currentPage.evaluate((element) =>
+    element.textContent.trim(), disciplinaElement);
 
-    grades.push(materia);
+  const disciplina = disciplinaFullName.split(' - ')[1]?.trim() || 'Desconhecida';
+  const materia = { fullName: disciplinaFullName, name: disciplina, notas: {} };
+
+  for (let j = 0; j < 12; j++) {
+    const tipoNota = getGradesType(j);
+    const notasIndex = i * 12 + j;
+    if (notasIndex >= tdNotas.length) continue;
+
+    const notaElement = tdNotas[notasIndex];
+    let nota = await currentPage.evaluate((element) =>
+      element.textContent.trim(), notaElement);
+    nota = nota.replace(/\n\t+/g, '');
+    materia.notas[tipoNota] = nota;
   }
+
+  grades.push(materia);
+}
+
 
   return {studentInfo, grades};
 }

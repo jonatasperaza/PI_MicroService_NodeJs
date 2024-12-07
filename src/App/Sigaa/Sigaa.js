@@ -26,7 +26,7 @@ router.get('/student', async (req, res) => {
   const data = {user, pass};
 
   if (!user || !pass) {
-    console.log(index, user, pass);
+    console.log(user, pass);
     return res.status(400).json({error: 'Missing parameters'});
   }
 
