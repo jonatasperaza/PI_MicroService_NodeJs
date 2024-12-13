@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx puppeteer browsers install chrome && node app.js",
+    "start": "npx puppeteer browsers install chrome --no-sandbox && node app.js --no-sandbox",
     "lint": "eslint './**/*.js?(x)'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
