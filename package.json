@@ -36,5 +36,8 @@
     "puppeteer": "^22.0.0",
     "qrcode-terminal": "^0.12.0",
     "pino-pretty": "^10.3.1"
+  },
+  "puppeteer": {
+    "skip_chromium_download": true
   }
 }
